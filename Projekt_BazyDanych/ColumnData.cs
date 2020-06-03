@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +14,16 @@ namespace Projekt_BazyDanych
         public string field, type, domyslna, extra, key;
         public bool nullable;
 
+        public string DisplayName
+        {
+            get
+            {
+                if (pkColumn == this)
+                    return field + " (PK)";
+                else
+                    return field;
+            }
+        }
 
         public ColumnData(IDataRecord record)
         {

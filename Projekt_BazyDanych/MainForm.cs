@@ -90,7 +90,7 @@ namespace Projekt_BazyDanych
 
                 for (int i = 0; i < columns.Count; i++)
                 {
-                    if (columns[i].field == ColumnData.pkColumn.field)
+                    if (columns[i] == ColumnData.pkColumn)
                         tableData_View.Columns.Add("Column", columns[i].field + " (PK)");
                     else
                         tableData_View.Columns.Add("Column", columns[i].field);
@@ -305,13 +305,13 @@ namespace Projekt_BazyDanych
             });
             return rows2;
         }
-        private async Task<List<string[]>> GetRows()
+        private async Task<List<string[]>> GetRows(string filter = "")
         {
             List<string[]> rows2 = new List<string[]>();
             return await Task.Run(() =>
             {
                 MysqlHandler.Polacz();
-                MySqlCommand polecenie = MysqlHandler.Query("SELECT * from " + selectedTable + " LIMIT 1000000000000");
+                MySqlCommand polecenie = MysqlHandler.Query("SELECT * from " + selectedTable + " "+filter+" LIMIT 10000");
                 try
                 {
                     MySqlDataReader reader = polecenie.ExecuteReader();
@@ -344,7 +344,8 @@ namespace Projekt_BazyDanych
 
         private void filterBtn_Click(object sender, EventArgs e)
         {
-
+            Filter f = new Filter(columns);
+            f.ShowDialog();
         }
     }
 
