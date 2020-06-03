@@ -13,11 +13,9 @@ namespace Projekt_BazyDanych
 {
     public partial class Filter : Form
     {
-        private List<ColumnData> columns;
         public Filter(List<ColumnData> columns)
         {
             InitializeComponent();
-            this.columns = columns;
             columnBox.DataSource = columns;
             columnBox.DisplayMember = "DisplayName";
             columnBox.SelectedIndex = 0;
@@ -160,19 +158,45 @@ namespace Projekt_BazyDanych
 
         private void searchButton_Click(object sender, EventArgs e)
         {
-            string searchString = "";
+            string searchString = "WHERE ";
+            bool gflag=false, oflag=false;
             for (int i = 0; i < filterList.Items.Count; i++)
             {
                 if (i == 0 || i == actgroupidx || i == actorderidx) continue;
-                if(i < actgroupidx)
-                    MessageBox.Show("where "+filterList.Items[i].ToString());
-                else if(i > actgroupidx && i < actorderidx)
-                    MessageBox.Show("group by " + filterList.Items[i].ToString());
+                if (i < actgroupidx)
+                {
+                    if (i == whereidx-1)
+                        searchString += filterList.Items[i].ToString() + " ";
+                    else
+                        searchString += filterList.Items[i].ToString() + " AND ";
+
+                }
+                else if (i > actgroupidx && i < actorderidx)
+                {
+                    if (!gflag)
+                    {
+                        searchString += " GROUP BY ";
+                        gflag = !gflag;
+                    }
+                    if (i == groupidx-1)
+                        searchString += filterList.Items[i].ToString() + " ";
+                    else
+                        searchString += filterList.Items[i].ToString() + ", ";
+                }
                 else
-                    MessageBox.Show("order by " + filterList.Items[i].ToString());
+                {
+                    if (!oflag)
+                    {
+                        searchString += " ORDER BY ";
+                        oflag = !oflag;
+                    }
+                    if (i == orderidx-1)
+                        searchString += filterList.Items[i].ToString() + " ";
+                    else
+                        searchString += filterList.Items[i].ToString() + ", ";
+                }
             }
-            MessageBox.Show(searchString);
-            //this.Close();   
+            this.Close();   
         }
 
         private void option_SelectedIndexChanged(object sender, EventArgs e)
