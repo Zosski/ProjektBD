@@ -23,12 +23,16 @@ namespace Projekt_BazyDanych
             option.SelectedIndex = 0;
         }
 
+        public string searchString = string.Empty;
+
         int whereidx = 1;
         int groupidx = 2;
         int orderidx = 3;
 
         int actgroupidx = 1;
         int actorderidx = 2;
+
+
 
         private void columnBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -158,13 +162,18 @@ namespace Projekt_BazyDanych
 
         private void searchButton_Click(object sender, EventArgs e)
         {
-            string searchString = "WHERE ";
-            bool gflag=false, oflag=false;
+            searchString = string.Empty;
+            bool wflag = false, gflag=false, oflag=false;
             for (int i = 0; i < filterList.Items.Count; i++)
             {
                 if (i == 0 || i == actgroupidx || i == actorderidx) continue;
                 if (i < actgroupidx)
                 {
+                    if (!wflag)
+                    {
+                        searchString += " WHERE ";
+                        wflag = !wflag;
+                    }
                     if (i == whereidx-1)
                         searchString += filterList.Items[i].ToString() + " ";
                     else

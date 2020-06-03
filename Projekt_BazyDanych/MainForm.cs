@@ -48,13 +48,13 @@ namespace Projekt_BazyDanych
 
         private void SetSafeInfo(string text)
         {
-            if (infoLabel.InvokeRequired)
+            if (loginBox.InvokeRequired)
             {
-                infoLabel.BeginInvoke((MethodInvoker)delegate () { infoLabel.Text = text; ; });
+                loginBox.BeginInvoke((MethodInvoker)delegate () { loginBox.Text = text; ; });
             }
             else
             {
-                infoLabel.Text = text;
+                loginBox.Text = text;
             }
         }
 
@@ -342,10 +342,17 @@ namespace Projekt_BazyDanych
 
         }
 
-        private void filterBtn_Click(object sender, EventArgs e)
+        private async void filterBtn_Click(object sender, EventArgs e)
         {
             Filter f = new Filter(columns);
             f.ShowDialog();
+            if (f.searchString != string.Empty)
+            {
+                rows = await GetRows(f.searchString);
+                curPage = 1;
+                ViewRows(curPage);
+            }
+
         }
     }
 
