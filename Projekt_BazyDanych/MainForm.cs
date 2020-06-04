@@ -95,10 +95,9 @@ namespace Projekt_BazyDanych
                     else
                         tableData_View.Columns.Add("Column", columns[i].field);
                 }
-
-                ViewRows(1);
                 curPage = 1;
-                pageInfo.Text = curPage.ToString();
+                ViewRows(curPage);
+                
 
                 LoadedTable = selectedTable;
             }
@@ -124,21 +123,125 @@ namespace Projekt_BazyDanych
             if (columns != null)
             {
                 tableData_View.Rows.Clear();
+                if (!(curPage < (rows.Count / 50) + 1))
+                    rowNextPageBtn.Enabled = false;
+                else
+                    rowNextPageBtn.Enabled = true;
 
-                int upperBound = page * 100 + 100;
+                if (curPage == 1)
+                    rowsPreviousPageBtn.Enabled = false;
+                else
+                    rowsPreviousPageBtn.Enabled = true;
+
+                int upperBound = page * 50 + 50;
                 if (rows.Count < upperBound)
                     upperBound = rows.Count;
 
-                for (int i = page * 100; i < upperBound; i++)
+                for (int i = page * 50; i < upperBound; i++)
                 {
                     tableData_View.Rows.Add(rows[i]);
                 }
             }
+            pageInfo.Text = curPage.ToString();
 
+        }
+
+        bool adding;
+        int editRow = -1;
+
+        private void onCellValueChange(object sender, DataGridViewCellEventArgs e)
+        {
+            return;
+        }
+
+
+        
+        private void onUserAddRow(object sender, DataGridViewRowEventArgs e)
+        {
+            adding = true;
+        }
+
+        private void onRowLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            if(adding)
+            {
+                //e.RowIndex
+                DataGridViewRow row = tableData_View.Rows[e.RowIndex];
+                adding = false;
+                bool[] skipCol = new bool[columns.Count];
+                string queryV = "";
+                string[] values = new string[columns.Count];
+
+                for (int i = 0; i < skipCol.Length; i++)
+                    skipCol[i] = false;
+                
+                for (int i = 0; i < columns.Count; i++)
+                {
+                    if (row.Cells[i].Value == null)
+                    {
+                        values[i] = "NULL";
+                        skipCol[i] = true;
+                        continue;
+                    }
+                    else
+                    {
+                        queryV += "'" + row.Cells[i].Value.ToString() + "'";
+                        values[i] = row.Cells[i].Value.ToString();
+                    }
+
+                    if (i == columns.Count - 1)
+                        queryV += ")";
+                    else
+                        queryV += ", ";
+                }
+
+
+                string query = "INSERT INTO " + selectedTable + " (";
+                bool first = true;
+                for (int i = 0; i < columns.Count; i++)
+                {
+                    ColumnData cols = columns[i];
+                    if(skipCol[i])
+                        continue;
+
+                    if (first)
+                    {
+                        query += cols.field;
+                        first = !first;
+                    }
+                    else
+                        query += "," + cols.field;
+                }
+                query += ") VALUES(" + queryV;
+
+                DialogResult dialogResult = MessageBox.Show("Kliknięcie TAK spowoduje wywołanie tego zapytania i dodanie pozycji:\n" + query, "Jesteś pewien?", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    bool noerr=true;
+                    try
+                    {
+                        MysqlHandler.Polacz();
+                        MySqlCommand polecenie = MysqlHandler.Query(query);
+                        polecenie.ExecuteNonQuery();
+                        MysqlHandler.Rozlacz();
+                    }
+                    catch (MySqlException ex)
+                    {
+                        MessageBox.Show(ex.Message + " " + (ex.Number));
+                        noerr = false;
+                    }
+                    if(noerr)
+                    {
+                        rows.Add(values);
+                    }
+                }
+                row.Visible = false;
+            }
         }
 
         private void onUserDeleteRow(object sender, DataGridViewRowCancelEventArgs e)
         {
+            string query;
             if (ColumnData.pkColumn != null)
             {
                 int pkIndex = 0;
@@ -152,25 +255,43 @@ namespace Projekt_BazyDanych
                 }
                 //without task
                 string pkValue = e.Row.Cells[pkIndex].Value.ToString();
-                string query = "DELETE from " + selectedTable + " where " + ColumnData.pkColumn.field + " = " + pkValue + ";";
-                DialogResult dialogResult = MessageBox.Show("Kliknięcie TAK spowoduje wywołanie tego zapytania i usunięcie pozycji:\n"+query, "Jesteś pewien?", MessageBoxButtons.YesNo);
-                if (dialogResult == DialogResult.Yes)
-                {
-                    try
-                    {
-                        MysqlHandler.Polacz();
-                        MySqlCommand polecenie = MysqlHandler.Query(query);
-                        polecenie.ExecuteNonQuery();
-                        MysqlHandler.Rozlacz();
-                    }
-                    catch (MySqlException ex)
-                    {
-                        MessageBox.Show(ex.Message + " " + (ex.Number));
-                    }
-                }
-                else
-                    e.Cancel = true;
+                query = "DELETE from " + selectedTable + " where " + ColumnData.pkColumn.field + " = '" + pkValue + "';";
             }
+            else
+            {
+                string wherestat = "";
+                bool flag = true;
+                for (int i = 0; i < columns.Count; i++)
+                {
+                    if (e.Row.Cells[i].Value.ToString() == "NULL") continue;
+                    ColumnData cols = columns[i];
+                    if (flag)
+                    {
+                        flag = !flag;
+                        wherestat += cols.field + " = '" + e.Row.Cells[i].Value.ToString() + "'";
+                    }
+                    else
+                        wherestat += "AND " + cols.field + " = '" + e.Row.Cells[i].Value.ToString() + "'";
+                }
+                query = "DELETE from " + selectedTable + " where " +  wherestat +" LIMIT 1;";
+            }
+            DialogResult dialogResult = MessageBox.Show("Kliknięcie TAK spowoduje wywołanie tego zapytania i usunięcie pozycji:\n" + query, "Jesteś pewien?", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                try
+                {
+                    MysqlHandler.Polacz();
+                    MySqlCommand polecenie = MysqlHandler.Query(query);
+                    polecenie.ExecuteNonQuery();
+                    MysqlHandler.Rozlacz();
+                }
+                catch (MySqlException ex)
+                {
+                    MessageBox.Show(ex.Message + " " + (ex.Number));
+                }
+            }
+            else
+                e.Cancel = true;
         }
 
 
@@ -259,7 +380,7 @@ namespace Projekt_BazyDanych
         //Rows prev page menag.
         private void rowNextPageBtn_Click(object sender, EventArgs e)
         {
-            if (curPage < rows.Count % 200)
+            if (curPage < (rows.Count / 50)+1)
                 curPage++;
 
             pageInfo.Text = curPage.ToString();
@@ -341,6 +462,7 @@ namespace Projekt_BazyDanych
 
 
         }
+        string searchString = "";
 
         private async void filterBtn_Click(object sender, EventArgs e)
         {
@@ -349,10 +471,17 @@ namespace Projekt_BazyDanych
             if (f.searchString != string.Empty)
             {
                 rows = await GetRows(f.searchString);
+                searchString = f.searchString;
                 curPage = 1;
                 ViewRows(curPage);
             }
 
+        }
+
+        private async void refresh_Click(object sender, EventArgs e)
+        {
+            rows = await GetRows(searchString);
+            ViewRows(curPage);
         }
     }
 

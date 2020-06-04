@@ -46,6 +46,7 @@
             this.table_record = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.table_selected = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.tab_columns = new System.Windows.Forms.TabPage();
+            this.filterBtn = new System.Windows.Forms.Button();
             this.pageInfo = new System.Windows.Forms.Label();
             this.rowsPreviousPageBtn = new System.Windows.Forms.Button();
             this.rowNextPageBtn = new System.Windows.Forms.Button();
@@ -59,7 +60,7 @@
             this.defaultValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.extra = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.infoLabel = new System.Windows.Forms.Label();
-            this.filterBtn = new System.Windows.Forms.Button();
+            this.refresh = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabPage_Tables.SuspendLayout();
             this.tab_Tables.SuspendLayout();
@@ -74,9 +75,9 @@
             // 
             this.connectBtn.Location = new System.Drawing.Point(623, 30);
             this.connectBtn.Name = "connectBtn";
-            this.connectBtn.Size = new System.Drawing.Size(75, 23);
+            this.connectBtn.Size = new System.Drawing.Size(94, 23);
             this.connectBtn.TabIndex = 0;
-            this.connectBtn.Text = "Get Data";
+            this.connectBtn.Text = "Set database";
             this.connectBtn.UseVisualStyleBackColor = true;
             this.connectBtn.Click += new System.EventHandler(this.connectBtn_Click);
             // 
@@ -201,7 +202,7 @@
             this.tab_Tables.Location = new System.Drawing.Point(4, 22);
             this.tab_Tables.Name = "tab_Tables";
             this.tab_Tables.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_Tables.Size = new System.Drawing.Size(768, 332);
+            this.tab_Tables.Size = new System.Drawing.Size(768, 299);
             this.tab_Tables.TabIndex = 0;
             this.tab_Tables.Text = "Tabele";
             this.tab_Tables.UseVisualStyleBackColor = true;
@@ -246,6 +247,7 @@
             // 
             // tab_columns
             // 
+            this.tab_columns.Controls.Add(this.refresh);
             this.tab_columns.Controls.Add(this.filterBtn);
             this.tab_columns.Controls.Add(this.pageInfo);
             this.tab_columns.Controls.Add(this.rowsPreviousPageBtn);
@@ -258,6 +260,16 @@
             this.tab_columns.TabIndex = 1;
             this.tab_columns.Text = "Przeglądaj";
             this.tab_columns.UseVisualStyleBackColor = true;
+            // 
+            // filterBtn
+            // 
+            this.filterBtn.Location = new System.Drawing.Point(444, 264);
+            this.filterBtn.Name = "filterBtn";
+            this.filterBtn.Size = new System.Drawing.Size(94, 23);
+            this.filterBtn.TabIndex = 4;
+            this.filterBtn.Text = "Filtruj wyniki";
+            this.filterBtn.UseVisualStyleBackColor = true;
+            this.filterBtn.Click += new System.EventHandler(this.filterBtn_Click);
             // 
             // pageInfo
             // 
@@ -295,14 +307,17 @@
             this.tableData_View.Name = "tableData_View";
             this.tableData_View.Size = new System.Drawing.Size(765, 252);
             this.tableData_View.TabIndex = 0;
+            this.tableData_View.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.onRowLeave);
+            this.tableData_View.UserAddedRow += new System.Windows.Forms.DataGridViewRowEventHandler(this.onUserAddRow);
             this.tableData_View.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.onUserDeleteRow);
+            this.tableData_View.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.onCellValueChange);
             // 
             // tab_colInfo
             // 
             this.tab_colInfo.Controls.Add(this.columnData_View);
             this.tab_colInfo.Location = new System.Drawing.Point(4, 22);
             this.tab_colInfo.Name = "tab_colInfo";
-            this.tab_colInfo.Size = new System.Drawing.Size(768, 332);
+            this.tab_colInfo.Size = new System.Drawing.Size(768, 299);
             this.tab_colInfo.TabIndex = 2;
             this.tab_colInfo.Text = "Kolumny";
             this.tab_colInfo.UseVisualStyleBackColor = true;
@@ -368,17 +383,17 @@
             this.infoLabel.TabIndex = 4;
             this.infoLabel.Text = "label5";
             // 
-            // filterBtn
+            // refresh
             // 
-            this.filterBtn.Location = new System.Drawing.Point(444, 264);
-            this.filterBtn.Name = "filterBtn";
-            this.filterBtn.Size = new System.Drawing.Size(94, 23);
-            this.filterBtn.TabIndex = 4;
-            this.filterBtn.Text = "Filtruj wyniki";
-            this.filterBtn.UseVisualStyleBackColor = true;
-            this.filterBtn.Click += new System.EventHandler(this.filterBtn_Click);
+            this.refresh.Location = new System.Drawing.Point(363, 264);
+            this.refresh.Name = "refresh";
+            this.refresh.Size = new System.Drawing.Size(75, 23);
+            this.refresh.TabIndex = 5;
+            this.refresh.Text = "Odśwież";
+            this.refresh.UseVisualStyleBackColor = true;
+            this.refresh.Click += new System.EventHandler(this.refresh_Click);
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -386,7 +401,7 @@
             this.Controls.Add(this.infoLabel);
             this.Controls.Add(this.tabPage_Tables);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "Form1";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
@@ -437,6 +452,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn defaultValue;
         private System.Windows.Forms.DataGridViewTextBoxColumn extra;
         private System.Windows.Forms.Button filterBtn;
+        private System.Windows.Forms.Button refresh;
     }
 }
 

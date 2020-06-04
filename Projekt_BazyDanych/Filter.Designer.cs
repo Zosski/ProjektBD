@@ -38,7 +38,6 @@
             this.deleteFilter = new System.Windows.Forms.Button();
             this.searchButton = new System.Windows.Forms.Button();
             this.option = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // columnBox
@@ -139,21 +138,11 @@
             this.option.TabIndex = 11;
             this.option.SelectedIndexChanged += new System.EventHandler(this.option_SelectedIndexChanged);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(587, 108);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 12;
-            this.label1.Text = "label1";
-            // 
             // Filter
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.label1);
+            this.ClientSize = new System.Drawing.Size(573, 219);
             this.Controls.Add(this.option);
             this.Controls.Add(this.searchButton);
             this.Controls.Add(this.deleteFilter);
@@ -183,6 +172,5 @@
         private System.Windows.Forms.Button deleteFilter;
         private System.Windows.Forms.Button searchButton;
         private System.Windows.Forms.ComboBox option;
-        private System.Windows.Forms.Label label1;
     }
 }
